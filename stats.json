@@ -2,45 +2,52 @@
   "total_posts": 227,
   "public_posts": 196,
   "private_posts": 31,
-  "public_words": 554667,
+  "public_words": 400802,
   "private_words": 77012,
-  "total_words": 631679,
+  "total_words": 477814,
+  "podcast_posts": 17,
   "by_year": {
     "2022": {
       "public": 8,
       "private": 0,
       "public_words": 10387,
-      "private_words": 0
+      "private_words": 0,
+      "podcast_posts": 0
     },
     "2025": {
       "public": 50,
       "private": 20,
-      "public_words": 154381,
-      "private_words": 49166
+      "public_words": 102345,
+      "private_words": 49166,
+      "podcast_posts": 7
     },
     "2024": {
       "public": 52,
       "private": 6,
-      "public_words": 200189,
-      "private_words": 14442
+      "public_words": 104676,
+      "private_words": 14442,
+      "podcast_posts": 9
     },
     "2023": {
       "public": 50,
       "private": 5,
-      "public_words": 117287,
-      "private_words": 13404
+      "public_words": 110971,
+      "private_words": 13404,
+      "podcast_posts": 1
     },
     "2021": {
       "public": 14,
       "private": 0,
       "public_words": 29674,
-      "private_words": 0
+      "private_words": 0,
+      "podcast_posts": 0
     },
     "2020": {
       "public": 22,
       "private": 0,
       "public_words": 42749,
-      "private_words": 0
+      "private_words": 0,
+      "podcast_posts": 0
     }
   },
   "by_type": {}
