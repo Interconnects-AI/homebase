@@ -30,10 +30,9 @@ class SubstackProcessor:
         self.posts_csv = self.export_dir / "posts.csv"
         self.posts_dir = self.export_dir / "posts"
         
-        # Ensure output directories exist
-        for visibility in ["public", "private"]:
-            for year in range(2020, 2026):
-                (self.output_base / visibility / str(year)).mkdir(parents=True, exist_ok=True)
+        # Ensure output directories exist (public only)
+        for year in range(2020, 2026):
+            (self.output_base / "public" / str(year)).mkdir(parents=True, exist_ok=True)
         
         # Images will be stored in year-specific folders
     
@@ -48,14 +47,18 @@ class SubstackProcessor:
         df = df[df['is_published'] == True].copy()
         df = df.dropna(subset=['post_date'])
         
+        # Filter out backoffice/logging entries (posts without actual email sends)
+        df = df.dropna(subset=['email_sent_at']).copy()
+        
+        # IMPORTANT: Only process public posts for this repository
+        # Private posts (only_paid) and any other audience types are excluded
+        df = df[df['audience'] == 'everyone'].copy()
+        
         # Extract year
         df['year'] = df['post_date'].dt.year
         
-        # Determine visibility
-        df['visibility'] = df['audience'].map({
-            'everyone': 'public',
-            'only_paid': 'private'
-        })
+        # All remaining posts are public
+        df['visibility'] = 'public'
         
         return df
     
@@ -67,7 +70,7 @@ class SubstackProcessor:
             return html_file
         return None
     
-    def download_image(self, img_url: str, post_id: str, visibility: str, year: str) -> Optional[str]:
+    def download_image(self, img_url: str, post_id: str, year: str) -> Optional[str]:
         """Download image and return local path."""
         try:
             # Parse image URL to get filename
@@ -84,8 +87,8 @@ class SubstackProcessor:
             # Generate local filename
             img_filename = f"{post_id}_{img_id}.png"
             
-            # Year-specific image directory
-            img_dir = self.output_base / visibility / year / "images"
+            # Year-specific image directory (public only)
+            img_dir = self.output_base / "public" / year / "images"
             img_dir.mkdir(parents=True, exist_ok=True)
             img_path = img_dir / img_filename
             
@@ -104,7 +107,7 @@ class SubstackProcessor:
             print(f"  Warning: Could not download image {img_url}: {e}")
             return None
 
-    def clean_html_content(self, html_content: str, post_id: str, visibility: str, year: str) -> str:
+    def clean_html_content(self, html_content: str, post_id: str, year: str) -> str:
         """Clean and prepare HTML content for conversion."""
         soup = BeautifulSoup(html_content, 'html.parser')
         
@@ -133,8 +136,8 @@ class SubstackProcessor:
             if img_tag and img_tag.get('src'):
                 img_src = img_tag.get('src')
                 
-                # Try to download image for public posts
-                local_path = self.download_image(img_src, post_id, visibility, year)
+                # Download image
+                local_path = self.download_image(img_src, post_id, year)
                 
                 # Create clean image tag
                 new_img = soup.new_tag('img')
@@ -146,11 +149,11 @@ class SubstackProcessor:
         
         return str(soup)
     
-    def convert_to_markdown(self, html_content: str, title: str, post_id: str, visibility: str, year: str) -> str:
+    def convert_to_markdown(self, html_content: str, title: str, post_id: str, year: str) -> str:
         """Convert HTML content to markdown using pandoc."""
         try:
             # Clean the HTML first
-            clean_html = self.clean_html_content(html_content, post_id, visibility, year)
+            clean_html = self.clean_html_content(html_content, post_id, year)
             
             # Convert to markdown
             markdown = pypandoc.convert_text(
@@ -206,7 +209,8 @@ class SubstackProcessor:
         date_prefix = row['post_date'].strftime('%Y-%m-%d')
         filename = f"{date_prefix}-{clean_title}.md"
         
-        return self.output_base / visibility / str(year) / filename
+        # All posts go to public folder since we only process public posts
+        return self.output_base / "public" / str(year) / filename
     
     def process_single_post(self, row: pd.Series) -> bool:
         """Process a single post."""
@@ -225,9 +229,8 @@ class SubstackProcessor:
                 html_content = f.read()
             
             # Convert to markdown 
-            visibility = row['visibility']
             year = str(row['year'])
-            markdown_content = self.convert_to_markdown(html_content, title, post_id, visibility, year)
+            markdown_content = self.convert_to_markdown(html_content, title, post_id, year)
             
             # Create frontmatter
             frontmatter = self.create_frontmatter(row)
@@ -256,10 +259,9 @@ class SubstackProcessor:
         
         print(f"Found {len(df)} published posts to process")
         
-        # Count by visibility
-        visibility_counts = df['visibility'].value_counts()
-        print(f"Public posts: {visibility_counts.get('public', 0)}")
-        print(f"Private posts: {visibility_counts.get('private', 0)}")
+        # All processed posts are public (private posts excluded)
+        print(f"Public posts to process: {len(df)}")
+        print(f"(Private/paid posts are excluded from this public repository)")
         
         # Count by year
         year_counts = df['year'].value_counts().sort_index()
