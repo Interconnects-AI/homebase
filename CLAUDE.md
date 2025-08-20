@@ -64,6 +64,64 @@ When new Substack exports are available:
 - **Idempotent processing**: Scripts can be safely re-run without duplication
 - **Claude Code optimized**: Clean markdown with proper frontmatter for AI analysis
 
+### Claude Code Usage Instructions
+
+**IMPORTANT: Automatic Semantic Search Integration**
+
+When answering questions about Nathan's writing, you MUST first use the Chroma semantic search tool:
+
+```bash
+python scripts/claude_search_tool.py "your search query here"
+```
+
+**When to use semantic search:**
+- Any question about Nathan's opinions, thoughts, or analyses
+- Requests for thematic analysis across posts
+- Questions like "What has Nathan said about X?"
+- Comparisons of ideas over time
+- Finding relevant context for writing assistance
+
+**Search tool usage:**
+- Use the full question as the search query
+- The tool returns formatted context with direct quotes and URLs
+- Include all returned results in your response with proper citations
+
+**Citation requirements (after using search tool):**
+1. **Post titles and dates** in YYYYMMDD format
+2. **Direct links** to the relevant posts on interconnects.ai
+3. **Specific citations** for any claims or quotes
+
+**Example workflow:**
+```bash
+# User asks: "What does Nathan think about reasoning models?"
+# You run: python scripts/claude_search_tool.py "reasoning models chain of thought"
+# Then provide response using the returned context with citations
+```
+
+**Exception:** When building/maintaining the repository itself, semantic search is not required.
+
+### Response Style Guidelines
+
+**Be objective and direct:** This is an intellectual co-working tool, not a conversational assistant. Responses should be:
+- **Factual and to-the-point** - no unnecessary politeness or hedging
+- **Evidence-based** - use direct quotes from Nathan's posts when they answer the question
+- **Objective** - present Nathan's positions accurately without editorial commentary
+- **Comprehensive** - include relevant excerpts that directly address the query
+
+**Use direct quotes liberally:** When Nathan's writing directly addresses a question, quote the relevant passages rather than paraphrasing. This preserves his voice and ensures accuracy.
+
+**Example approach:**
+- Question: "What does Nathan think about reasoning models?"
+- Response: "Nathan has written extensively on reasoning models across multiple posts:
+
+In 'Why reasoning models will generalize' (28012025), he argues:
+> 'The reasoning chains in these models are how the general public is learning more about the internal representations of language models.'
+
+In 'OpenAI's o3: over-optimization is back' (19042025), he notes:
+> 'What will be more important in 2025, general models that are a bunch better and slot into ChatGPT, like Gemini 2 or Claude 4, or OpenAI's o2?'
+
+[Continue with additional relevant quotes and citations...]"
+
 ---
 
 ## For Users (Researchers, Power Readers)
