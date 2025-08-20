@@ -57,3 +57,6 @@ export/
 # Temporary files
 temp/
 tmp/
+
+# Chroma vector database - large binary files, regenerate locally
+chroma_db/
